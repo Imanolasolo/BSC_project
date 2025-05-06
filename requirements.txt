@@ -1,0 +1,7 @@
+streamlit
+bcrypt
+jwt
+datetime
+urllib3
+streamlit.components.v1
+webbrowser
