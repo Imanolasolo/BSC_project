@@ -3,3 +3,4 @@ PyJWT
 bcrypt
 PyPDF2
 langchain
+langchain_openai
