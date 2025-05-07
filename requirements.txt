@@ -1,3 +1,5 @@
 streamlit
 PyJWT
 bcrypt
+PyPDF2
+langchain
