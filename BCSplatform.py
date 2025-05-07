@@ -213,6 +213,7 @@ def main():
             with st.expander(t["instructions_title"]):
                 st.write(t["instructions"])
 
+            # Add WhatsApp registration button and Chatbot button
             st.markdown(
                 f"""
                 <style>
@@ -227,12 +228,29 @@ def main():
                     text-decoration: none;
                     border-radius: 5px;
                     margin-top: 10px;
+                    margin-right: 10px;
                 }}
                 .whatsapp-button:hover {{
                     background-color: #1DA851;
                 }}
+                .chatbot-button {{
+                    display: inline-block;
+                    background-color: transparent; /* Removed background color */
+                    color: #007BFF; /* Set text color to blue */
+                    padding: 10px 20px;
+                    font-size: 16px;
+                    font-weight: bold;
+                    text-align: center;
+                    text-decoration: none;
+                    border-radius: 5px;
+                    margin-top: 10px;
+                }}
+                .chatbot-button:hover {{
+                    text-decoration: underline; /* Added underline on hover for emphasis */
+                }}
                 </style>
                 <a class="whatsapp-button" href="https://wa.me/+5930993513082?text=Hello%20BCS%20team,%20I%20want%20to%20register%20for%20the%20BCS%20platform." target="_blank">{t["register_button"]}</a>
+                <a class="chatbot-button" href="https://bcs-chatbot-user.streamlit.app/?embed_options=dark_theme" target="_blank">Chatea con Nosotros</a>
                 """,
                 unsafe_allow_html=True
             )
