@@ -213,6 +213,15 @@ st.success(t["cta_demo"])
 st.markdown(t["cta_contact"])
 st.markdown(t["cta_email"])
 
+# Promoter button
+promoter_button_text = {
+    "es": "¿Quieres hacer negocio siendo promotor de BCS?",
+    "en": "Do you want to do business as a BCS promoter?"
+}
+promoter_url = "https://bcspromoter-landing.streamlit.app/"
+if st.button(promoter_button_text[lang]):
+    st.markdown(f'<a href="{promoter_url}" target="_blank">{promoter_button_text[lang]}</a>', unsafe_allow_html=True)
+
 # Footer
 st.markdown("---")
 st.caption(t["footer"])
