@@ -218,7 +218,7 @@ promoter_button_text = {
     "es": "¿Quieres hacer negocio siendo promotor de BCS?",
     "en": "Do you want to do business as a BCS promoter?"
 }
-promoter_url = "https://bcspromoter-landing.streamlit.app/"
+promoter_url = "https://bcspromoter-landing.streamlit.app/?embed_options=dark_theme"
 if st.button(promoter_button_text[lang]):
     st.markdown(f'<a href="{promoter_url}" target="_blank">{promoter_button_text[lang]}</a>', unsafe_allow_html=True)
 
