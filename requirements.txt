@@ -7,5 +7,4 @@ langchain_openai
 langchain_community
 PyMuPDF
 tiktoken
-faiss-gpu
-
+faiss-cpu
