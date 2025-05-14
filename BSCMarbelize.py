@@ -65,7 +65,8 @@ Incluye módulos interactivos como:
 - **Tableros interactivos y reportes en tiempo real**
 """)
 if st.button("Chatea con BCS para conocer más"):
-    chat_url = "https://bcs-customer-chat.streamlit.app/"
+    chat_url = "https://bcs-customer-chat.streamlit.app/?embed_options=dark_theme" \
+    ""
     st.markdown(f'<a href="{chat_url}" target="_blank">Ir al chat</a>', unsafe_allow_html=True)
 
 
