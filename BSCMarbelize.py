@@ -64,6 +64,10 @@ Incluye módulos interactivos como:
 - **Herramientas de trazabilidad y logística**
 - **Tableros interactivos y reportes en tiempo real**
 """)
+if st.button("Chatea con BCS para conocer más"):
+    chat_url = "https://bcs-customer-chat.streamlit.app/"
+    st.markdown(f'<a href="{chat_url}" target="_blank">Ir al chat</a>', unsafe_allow_html=True)
+
 
 # Sección: ¿Por qué Marbelize?
 st.markdown("### ¿Por qué Marbelize?")
@@ -90,7 +94,11 @@ st.markdown("Agenda una demostración personalizada o solicita un diagnóstico g
 
 # Botón para agendar reunión
 if st.button("Solicitar una demo gratuita"):
-    st.success("Gracias por tu interés. Te contactaremos en breve para agendar la reunión.")
+    whatsapp_message = "Marbelize solicita una demo gratuita y una reunion para ver los alcances de BCS"
+    whatsapp_number = "+5930993513082"
+    whatsapp_link = f"https://wa.me/{whatsapp_number}?text={whatsapp_message.replace(' ', '%20')}"
+    st.markdown(f'<a href="{whatsapp_link}" target="_blank">Haz clic aquí para enviar el mensaje por WhatsApp</a>', unsafe_allow_html=True)
+    st.success("Gracias por tu interés. Haz clic en el enlace para enviar el mensaje por WhatsApp.")
 
 # Footer
 st.markdown("---")
