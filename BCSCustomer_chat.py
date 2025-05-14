@@ -85,7 +85,7 @@ def main():
         st.image('logo1.png', width=200)
     with col2:
         st.header("CodeCodix AI Lab")
-        st.text("Tu asistente virtual")
+        st.subheader(":red[BCS] - Tu asistente virtual")
         st.text ("La Inteligencia Artificial a tu servicio")
         st.info("Interactúa con nuestro chat y descubre que es lo que la IA puede hacer por tu negocio o proyecto")
         
