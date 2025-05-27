@@ -4,15 +4,16 @@ import streamlit as st
 from PIL import Image
 
 st.set_page_config(page_title="BCS para Hospicor", layout="wide")
-
+col1, col2 = st.columns([1, 4])
+with col1:
 # Banner o logo
-st.image("logo.svg", width=200)
+    st.image("logo.svg", width=200)
 
 # Título principal
-st.markdown("""
-# 🤖 BCS – Business Core Software para **Hospicor**
-### Automatiza, controla y escala tu operación con inteligencia artificial
-""")
+with col2:
+    st.title(":red[BCS] para Hospicor")
+    st.subheader("Automatiza, controla y escala tu operación con inteligencia artificial")
+
 
 # Sección 1: Qué es un BCS
 st.markdown("## ¿Qué es un BCS?")
@@ -29,6 +30,11 @@ st.success("""
 - 📊 Dashboard en tiempo real de indicadores clave
 - 🧠 IA para análisis predictivo y soporte a la toma de decisiones
 """)
+
+if st.button("Chatea con BCS para conocer más"):
+    chat_url = "https://bcs-customer-chat.streamlit.app/?embed_options=dark_theme" \
+    ""
+    st.markdown(f'<a href="{chat_url}" target="_blank">Ir al chat</a>', unsafe_allow_html=True)
 
 # Sección 3: ¿Por qué elegir BCS?
 st.markdown("## ¿Por qué elegir BCS?")
@@ -58,7 +64,15 @@ with lead:
     submit = st.form_submit_button("Solicitar demo gratuita")
 
 if submit:
-    st.success(f"Gracias, {nombre}! Te contactaremos pronto para coordinar la demo.")
+    whatsapp_message = (
+        f"Hola, soy {nombre} ({cargo}).\n"
+        f"Correo: {email}\n"
+        f"Mensaje: {mensaje}\n"
+        "Solicito una demo gratuita de BCS para Hospicor."
+    )
+    whatsapp_link = f"https://wa.me/5930993513082?text={whatsapp_message.replace(' ', '%20').replace('\n', '%0A')}"
+    st.success(f"Gracias, {nombre}! Haz clic en el siguiente enlace para enviar tu solicitud por WhatsApp.")
+    st.markdown(f'<a href="{whatsapp_link}" target="_blank">Enviar por WhatsApp</a>', unsafe_allow_html=True)
 
 # Footer
 st.markdown("""
