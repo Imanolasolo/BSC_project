@@ -3,6 +3,31 @@ import streamlit as st
 # --- Configuración de la página ---
 st.set_page_config(page_title="AI for Startups - Presentación", layout="centered")
 
+# --- Forzar tema oscuro en Streamlit ---
+st.markdown(
+    """
+    <style>
+    body, .stApp {
+        background-color: #18191A !important;
+        color: #F5F6F7 !important;
+    }
+    .stButton>button {
+        background-color: #242526 !important;
+        color: #F5F6F7 !important;
+        border: 1px solid #444950 !important;
+    }
+    .stSelectbox, .stTextInput, .stExpander, .stRadio, .stTable, .stMarkdown, .stHeader, .stSubheader, .stTitle {
+        background-color: #18191A !important;
+        color: #F5F6F7 !important;
+    }
+    .stImage img {
+        background: #18191A !important;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 # --- Slides de la presentación ---
 slides = [
     {
