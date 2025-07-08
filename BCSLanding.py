@@ -3,6 +3,14 @@
 import streamlit as st
 from PIL import Image
 import base64
+from PyPDF2 import PdfReader
+from langchain.text_splitter import CharacterTextSplitter
+from langchain_openai import OpenAIEmbeddings
+from langchain_community.vectorstores import FAISS
+from langchain.chat_models import ChatOpenAI 
+from htmlTemplates import css, bot_template, user_template
+import os
+import sqlite3
 
 # Configuración inicial
 st.set_page_config(
@@ -45,6 +53,121 @@ def add_bg_from_local(bin_file):
     )
 
 add_bg_from_local("background1.jpg")
+
+# Set your name for the AIProfileVCard
+name = 'CodeCodix AI lab'
+
+# Function to extract text from a PDF file
+def get_pdf_text(pdf_path):
+    pdf_reader = PdfReader(pdf_path)
+    text = ""
+    # Iterate through each page and extract text
+    for page in pdf_reader.pages:
+        text += page.extract_text()
+    return text
+
+# Function to split the extracted text into manageable chunks for processing
+def get_text_chunks(text):
+    text_splitter = CharacterTextSplitter(
+        separator="\n",
+        chunk_size=1000,
+        chunk_overlap=200,
+        length_function=len,
+    )
+    chunks = text_splitter.split_text(text)
+    return chunks
+
+# Function to generate a vector store using the text chunks
+def get_vector_store(text_chunks):
+    # Cambia la clave a "OPENAI_API_KEY" (nombre estándar de Streamlit)
+    openai_key = st.secrets.get("OPENAI_API_KEY") or st.secrets.get("OPEN_AI_APIKEY")
+    if not openai_key:
+        st.error("No se encontró la clave OPENAI_API_KEY en secrets.toml. Por favor, revisa el nombre de la clave.")
+        st.stop()
+    embeddings = OpenAIEmbeddings(openai_api_key=openai_key)
+    vectorstore = FAISS.from_texts(texts=text_chunks, embedding=embeddings)
+    return vectorstore
+
+# Function to create a context from the database
+def create_db_context(db_path):
+    try:
+        connection = sqlite3.connect(db_path)
+        cursor = connection.cursor()
+
+        # Get all table names in the database
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
+        tables = cursor.fetchall()
+
+        if not tables:
+            return "No se encontraron tablas en la base de datos."
+
+        # Extract and format data from each table
+        context = ""
+        for table in tables:
+            table_name = table[0]
+            context += f"\n### Table: {table_name} ###\n"
+            try:
+                cursor.execute(f"SELECT * FROM {table_name};")
+                rows = cursor.fetchall()
+
+                # Get column names for the table
+                cursor.execute(f"PRAGMA table_info({table_name});")
+                columns = [col[1] for col in cursor.fetchall()]
+                context += ", ".join(columns) + "\n"  # Add column headers
+
+                # Add rows of data
+                for row in rows:
+                    context += ", ".join(map(str, row)) + "\n"
+            except sqlite3.OperationalError as e:
+                context += f"Error al acceder a la tabla {table_name}: {str(e)}\n"
+
+        connection.close()
+        return context
+
+    except Exception as e:
+        return f"Se produjo un error inesperado al procesar la base de datos: {str(e)}"
+
+# Function to create a combined context from the PDF and database
+def create_combined_context(pdf_path, db_path):
+    # Extract text from the PDF
+    pdf_text = get_pdf_text(pdf_path)
+
+    # Extract data from the database
+    db_context = create_db_context(db_path)
+
+    # Combine the PDF text and database context
+    combined_context = f"### Contexto del PDF ###\n{pdf_text}\n\n### Contexto de la Base de Datos ###\n{db_context}"
+    return combined_context
+
+# Function to handle user input and generate responses
+def handle_user_input(user_question):
+    # Paths to the PDF and database
+    pdf_path = os.path.join(os.getcwd(), "¿Qué es BCS AI.pdf")
+    db_path = os.path.join(os.getcwd(), "platform.db")
+
+    # Create the combined context
+    combined_context = create_combined_context(pdf_path, db_path)
+
+    # Use the language model to generate a response
+    try:
+        # Cambia la clave a "OPENAI_API_KEY" (nombre estándar de Streamlit)
+        openai_key = st.secrets.get("OPENAI_API_KEY") or st.secrets.get("OPEN_AI_APIKEY")
+        if not openai_key:
+            st.error("No se encontró la clave OPENAI_API_KEY en secrets.toml. Por favor, revisa el nombre de la clave.")
+            st.stop()
+        llm = ChatOpenAI(openai_api_key=openai_key)
+        prompt = f"{combined_context}\n\nPregunta: {user_question}\nRespuesta:"
+        response = llm.predict(prompt)  # Correct method to generate a response
+
+        # Display the response
+        st.write(bot_template.replace("{{MSG}}", response), unsafe_allow_html=True)
+
+        # Log the user question and bot response for debugging
+        print(f"User: {user_question}")
+        print(f"Bot: {response}")
+
+    except Exception as e:
+        st.write(f"Se produjo un error al generar la respuesta: {str(e)}")
 
 # Translations
 translations = {
@@ -204,14 +327,40 @@ with col3:
 
 # Testimonios / Casos de uso
 st.markdown(f"## {t['use_cases_title']}")
-for case in t["use_cases"]:
-    st.info(case)
+use_cases = t["use_cases"]
+col1, col2, col3 = st.columns(3)
+if len(use_cases) > 0:
+    with col1:
+        st.info(use_cases[0])
+if len(use_cases) > 1:
+    with col2:
+        st.info(use_cases[1])
+if len(use_cases) > 2:
+    with col3:
+        st.info(use_cases[2])
 
 # Call to action
 st.markdown(f"## {t['cta_title']}")
 st.success(t["cta_demo"])
-st.markdown(t["cta_contact"])
-st.markdown(t["cta_email"])
+col1, col2, col3 = st.columns(3)
+with col1:
+    st.markdown(t["cta_contact"])
+with col2:
+    st.markdown(t["cta_email"])
+with col3:
+    # Traducción del título y placeholder del chatbot según idioma
+    chat_expander_title = {
+        "es": "Chatea con nosotros",
+        "en": "Chat with us"
+    }
+    chat_placeholder = {
+        "es": "Dinos quién eres y qué haces y podremos ayudarte mejor:",
+        "en": "Tell us who you are and what you do so we can help you better:"
+    }
+    with st.expander(chat_expander_title[lang]):
+        user_question = st.text_input(chat_placeholder[lang])
+        if user_question:
+            handle_user_input(user_question)
 
 # Promoter button
 promoter_button_text = {
