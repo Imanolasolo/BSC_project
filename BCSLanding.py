@@ -367,9 +367,10 @@ with col3:
         "es": "Dinos quién eres y qué haces y podremos ayudarte mejor:",
         "en": "Tell us who you are and what you do so we can help you better:"
     }
-    user_question = st.text_input(chat_placeholder[lang])
-    if user_question:
-        handle_user_input(user_question)
+    with st.expander(chat_expander_title[lang]):
+        user_question = st.text_input(chat_placeholder[lang])
+        if user_question:
+            handle_user_input(user_question)
 
 # Promoter button
 promoter_button_text = {
