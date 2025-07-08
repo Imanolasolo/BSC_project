@@ -79,10 +79,19 @@ def get_text_chunks(text):
 
 # Function to generate a vector store using the text chunks
 def get_vector_store(text_chunks):
-    # Cambia la clave a "OPENAI_API_KEY" (nombre estándar de Streamlit)
-    openai_key = st.secrets.get("OPENAI_API_KEY") or st.secrets.get("OPEN_AI_APIKEY")
+    # Compatibilidad para diferentes entornos de Streamlit Cloud
+    openai_key = (
+        st.secrets.get("OPENAI_API_KEY")
+        or st.secrets.get("OPEN_AI_APIKEY")
+        or st.secrets["openai_api_key"]
+        if "openai_api_key" in st.secrets
+        else None
+    )
     if not openai_key:
-        st.error("No se encontró la clave OPENAI_API_KEY en secrets.toml. Por favor, revisa el nombre de la clave.")
+        st.error(
+            "No se encontró la clave OPENAI_API_KEY en secrets.toml. "
+            "Asegúrate de que la clave esté definida como OPENAI_API_KEY, OPEN_AI_APIKEY o openai_api_key."
+        )
         st.stop()
     embeddings = OpenAIEmbeddings(openai_api_key=openai_key)
     vectorstore = FAISS.from_texts(texts=text_chunks, embedding=embeddings)
@@ -151,9 +160,18 @@ def handle_user_input(user_question):
     # Use the language model to generate a response
     try:
         # Cambia la clave a "OPENAI_API_KEY" (nombre estándar de Streamlit)
-        openai_key = st.secrets.get("OPENAI_API_KEY") or st.secrets.get("OPEN_AI_APIKEY")
+        openai_key = (
+            st.secrets.get("OPENAI_API_KEY")
+            or st.secrets.get("OPEN_AI_APIKEY")
+            or st.secrets["openai_api_key"]
+            if "openai_api_key" in st.secrets
+            else None
+        )
         if not openai_key:
-            st.error("No se encontró la clave OPENAI_API_KEY en secrets.toml. Por favor, revisa el nombre de la clave.")
+            st.error(
+                "No se encontró la clave OPENAI_API_KEY en secrets.toml. "
+                "Asegúrate de que la clave esté definida como OPENAI_API_KEY, OPEN_AI_APIKEY o openai_api_key."
+            )
             st.stop()
         llm = ChatOpenAI(openai_api_key=openai_key)
         prompt = f"{combined_context}\n\nPregunta: {user_question}\nRespuesta:"
