@@ -77,22 +77,27 @@ def get_text_chunks(text):
     chunks = text_splitter.split_text(text)
     return chunks
 
+def get_openai_key():
+    # Busca la API key en todas las variantes posibles y muestra el error con las claves encontradas
+    posibles = [
+        "OPENAI_API_KEY",
+        "OPEN_AI_APIKEY",
+        "openai_api_key",
+        "open_ai_apikey"
+    ]
+    for k in posibles:
+        if k in st.secrets:
+            return st.secrets[k]
+    st.error(
+        "No se encontró la clave de OpenAI en secrets.toml. "
+        "Asegúrate de que la clave esté definida como OPENAI_API_KEY, OPEN_AI_APIKEY, openai_api_key o open_ai_apikey. "
+        f"Claves encontradas: {list(st.secrets.keys())}"
+    )
+    st.stop()
+
 # Function to generate a vector store using the text chunks
 def get_vector_store(text_chunks):
-    # Compatibilidad para diferentes entornos de Streamlit Cloud
-    openai_key = (
-        st.secrets.get("OPENAI_API_KEY")
-        or st.secrets.get("OPEN_AI_APIKEY")
-        or st.secrets["openai_api_key"]
-        if "openai_api_key" in st.secrets
-        else None
-    )
-    if not openai_key:
-        st.error(
-            "No se encontró la clave OPENAI_API_KEY en secrets.toml. "
-            "Asegúrate de que la clave esté definida como OPENAI_API_KEY, OPEN_AI_APIKEY o openai_api_key."
-        )
-        st.stop()
+    openai_key = get_openai_key()
     embeddings = OpenAIEmbeddings(openai_api_key=openai_key)
     vectorstore = FAISS.from_texts(texts=text_chunks, embedding=embeddings)
     return vectorstore
@@ -159,20 +164,7 @@ def handle_user_input(user_question):
 
     # Use the language model to generate a response
     try:
-        # Cambia la clave a "OPENAI_API_KEY" (nombre estándar de Streamlit)
-        openai_key = (
-            st.secrets.get("OPENAI_API_KEY")
-            or st.secrets.get("OPEN_AI_APIKEY")
-            or st.secrets["openai_api_key"]
-            if "openai_api_key" in st.secrets
-            else None
-        )
-        if not openai_key:
-            st.error(
-                "No se encontró la clave OPENAI_API_KEY en secrets.toml. "
-                "Asegúrate de que la clave esté definida como OPENAI_API_KEY, OPEN_AI_APIKEY o openai_api_key."
-            )
-            st.stop()
+        openai_key = get_openai_key()
         llm = ChatOpenAI(openai_api_key=openai_key)
         prompt = f"{combined_context}\n\nPregunta: {user_question}\nRespuesta:"
         response = llm.predict(prompt)  # Correct method to generate a response
@@ -375,10 +367,9 @@ with col3:
         "es": "Dinos quién eres y qué haces y podremos ayudarte mejor:",
         "en": "Tell us who you are and what you do so we can help you better:"
     }
-    with st.expander(chat_expander_title[lang]):
-        user_question = st.text_input(chat_placeholder[lang])
-        if user_question:
-            handle_user_input(user_question)
+    user_question = st.text_input(chat_placeholder[lang])
+    if user_question:
+        handle_user_input(user_question)
 
 # Promoter button
 promoter_button_text = {
@@ -386,7 +377,7 @@ promoter_button_text = {
     "en": "Do you want to do business as a BCS promoter?"
 }
 promoter_url = "https://bcspromoter-landing.streamlit.app/?embed_options=dark_theme"
-if st.button(promoter_button_text[lang]):
+if st.button(promoter_button_text[lang], key=f"promoter_btn_{lang}"):
     st.markdown(f'<a href="{promoter_url}" target="_blank">{promoter_button_text[lang]}</a>', unsafe_allow_html=True)
 
 # Footer
