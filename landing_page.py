@@ -261,7 +261,7 @@ st.markdown("---")
 
 st.header(T["core_header"])
 
-with st.expander(T["exp_monitor_title"], expanded=True):
+with st.expander(T["exp_monitor_title"], expanded=False):
     st.markdown(T["exp_monitor_body"])
 
 with st.expander(T["exp_diag_title"]):
